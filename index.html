@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script>
+        //   数据 + 数据 + 还是数据
+        var data = [
+            {
+                id: 1,
+                pid: 0,
+                name: '编程'
+            },
+            {
+                id: 2,
+                pid: 0,
+                name: '家电'
+            },
+            {
+                id: 3,
+                pid: 0,
+                name: '服装'
+            },
+            {
+                id: 4,
+                pid: 2,
+                name: 'javascript'
+            },
+            {
+                id: 5,
+                pid: 4,
+                name: 'ECMAScript'
+            },
+            {
+                id: 6,
+                pid: 3,
+                name: '男装'
+            },
+            {
+                id: 7,
+                pid: 4,
+                name: 'DOM'
+            }
+        ];
+
+
+        //获取一级
+        function getChildren(pid) {
+            var arr = [];
+            for (var i=0; i<data.length; i++) {
+                if (data[i].pid == pid) {
+                    arr.push(data[i]);
+                }
+            }
+            return arr;
+        }
+
+        function getChildrenAll(pid,level) {
+        	console.log(111);
+            var level = level || 0;//层级  用来控制空格的长度
+            
+            
+            var children = getChildren(pid);	//获取children数据
+            var childrenAll = [];
+            
+            //debugger;
+            
+            for (var i=0; i<children.length; i++) {
+                children[i]._level = level;//自定义属性_level---层级
+                childrenAll.push(children[i]);
+                
+                childrenAll = childrenAll.concat( getChildrenAll( children[i].id, level + 1 ) );
+                
+            }
+            
+            return childrenAll;
+            
+
+        }
+
+        function getMaxId() {
+            var maxId = 0;
+            for (var i=0; i<data.length; i++) {
+                if (data[i].id > maxId) {
+                    maxId = data[i].id;
+                }
+            }
+            return maxId;
+        }
+
+        //console.log(getChildren(4))
+        //console.log(getChildrenAll(1))
+
+        window.onload = function() {
+
+            var treeElement = document.querySelector('#tree');
+            var newName = document.querySelector('#newName');
+            var button = document.querySelector('button');
+
+            setSelect();
+
+            function setSelect() {
+                var treeData = getChildrenAll(0);//所有元素集合
+
+
+                treeElement.innerHTML = ''; 
+                
+                for (var i=0; i<treeData.length; i++) {
+                    var option = document.createElement('option');
+                    
+                    option.value = treeData[i].id;//设置每一层的自定义value 添加时给哪个value下添加子级
+
+                    var sp = '';//空格
+                    for (var j=0; j<treeData[i]._level; j++) {
+                        sp += '&nbsp&nbsp&nbsp&nbsp';
+                    }
+
+                    option.innerHTML = sp + treeData[i].name;
+                    
+                    treeElement.appendChild(option);
+                    
+//                  console.log(treeData[i]._level,option.value,treeData[i].id,treeData[i].pid)//??????????
+//                  0 "1" 1 0
+//					0 "2" 2 0
+//					1 "4" 4 2
+//					2 "5" 5 4
+//					2 "7" 7 4
+//					0 "3" 3 0
+//					1 "6" 6 3
+                    
+                    
+                    
+//                   console.log(treeData[i]._level,option.innerHTML)//??????????
+//                  0 "编程"
+//					0 "家电"
+//					1 "&nbsp;&nbsp;&nbsp;&nbsp;javascript"
+//					2 "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ECMAScript"
+//					2 "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DOM"
+//					0 "服装"
+//					1 "&nbsp;&nbsp;&nbsp;&nbsp;男装"
+                }
+            }
+
+            button.onclick = function() {
+            	console.log( parseInt(treeElement.value) );
+                data.push({
+                    id: getMaxId() + 1,
+                    pid: parseInt(treeElement.value),
+                    name: newName.value
+                });
+                
+                setSelect();
+                
+            }
+
+        }
+
+    </script>
+</head>
+<body>
+    <select id="tree"></select>
+    <input type="text" id="newName">
+    <button>添加</button>
+</body>
+</html>
